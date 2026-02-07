@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${#lists.isEmpty(book.id) ? 'Create Book' : 'Edit Book'}">Book Form</title>
+</head>
+<body>
+<h1 th:text="${book.id} == null ? 'Create Book' : 'Edit Book'"></h1>
+<form th:action="${book.id} == null ? @{/books} : @{'/books/' + ${book.id}}" th:object="${book}" method="post">
+    <div>
+        <label for="title">Title:</label>
+        <input type="text" id="title" th:field="*{title}" required>
+    </div>
+    <div>
+        <label for="author">Author:</label>
+        <input type="text" id="author" th:field="*{author}" required>
+    </div>
+    <div>
+        <label for="isbn">ISBN:</label>
+        <input type="text" id="isbn" th:field="*{isbn}">
+    </div>
+    <div>
+        <label for="publicationYear">Publication Year:</label>
+        <input type="number" id="publicationYear" th:field="*{publicationYear}">
+    </div>
+    <div>
+        <button type="submit">Save</button>
+        <a th:href="@{/books}">Cancel</a>
+    </div>
+</form>
+</body>
+</html>
