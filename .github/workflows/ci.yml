@@ -14,6 +14,10 @@ on:
   pull_request:
     branches: [ "main" ]
 
+permissions:
+  contents: read
+  packages: write
+  
 jobs:
   build:
 
@@ -29,6 +33,10 @@ jobs:
         cache: maven
     - name: Build with Maven
       run: mvn clean package -DskipTests
+
+    - name: Log in to GitHub Container Registry
+      run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
     - name: Build Docker image (tagged with commit SHA)
       run: |
         SHORT_SHA=${GITHUB_SHA::7}
@@ -36,4 +44,10 @@ jobs:
           -t book:${SHORT_SHA} \
           -t book:latest \
           .
+  
+    - name: Push Docker image to GHCR
+      run: |
+        SHORT_SHA=${GITHUB_SHA::7}
+        docker push ghcr.io/${{ github.repository }}:${SHORT_SHA}
+        docker push ghcr.io/${{ github.repository }}:latest
 
