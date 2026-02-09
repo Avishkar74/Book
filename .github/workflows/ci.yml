@@ -17,7 +17,7 @@ on:
 permissions:
   contents: read
   packages: write
-  
+
 jobs:
   build:
 
@@ -37,12 +37,13 @@ jobs:
     - name: Log in to GitHub Container Registry
       run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
-    - name: Build Docker image (tagged with commit SHA)
+
+    - name: Build Docker image (SHA + latest)
       run: |
         SHORT_SHA=${GITHUB_SHA::7}
         docker build \
-          -t book:${SHORT_SHA} \
-          -t book:latest \
+          -t ghcr.io/${{ github.repository }}:${SHORT_SHA} \
+          -t ghcr.io/${{ github.repository }}:latest \
           .
   
     - name: Push Docker image to GHCR
