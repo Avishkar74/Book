@@ -29,6 +29,11 @@ jobs:
         cache: maven
     - name: Build with Maven
       run: mvn clean package -DskipTests
-    - name: Build Docker image
-      run: docker build -t book:ci .
+    - name: Build Docker image (tagged with commit SHA)
+      run: |
+        SHORT_SHA=${GITHUB_SHA::7}
+        docker build \
+          -t book:${SHORT_SHA} \
+          -t book:latest \
+          .
 
