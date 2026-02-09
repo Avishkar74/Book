@@ -49,7 +49,10 @@ jobs:
   
     - name: Push Docker image to GHCR
       run: |
+        IMAGE_NAME=ghcr.io/$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
         SHORT_SHA=${GITHUB_SHA::7}
-        docker push ghcr.io/${{ github.repository }}:${SHORT_SHA}
-        docker push ghcr.io/${{ github.repository }}:latest
+
+        docker push $IMAGE_NAME:$SHORT_SHA
+        docker push $IMAGE_NAME:latest
+
 
