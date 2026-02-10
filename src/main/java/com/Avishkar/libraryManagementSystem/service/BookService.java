@@ -4,6 +4,9 @@ import com.Avishkar.libraryManagementSystem.dto.BookRequest;
 import com.Avishkar.libraryManagementSystem.entity.Book;
 import com.Avishkar.libraryManagementSystem.repository.BookRepository;
 import java.util.List;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -17,6 +20,7 @@ public class BookService {
         this.bookRepository = bookRepository;
     }
 
+    @CacheEvict(value = {"booksAll", "booksSearch"}, allEntries = true)
     public Book addBook(BookRequest request) {
         Book book = new Book();
         book.setTitle(request.getTitle());
@@ -28,15 +32,19 @@ public class BookService {
         return bookRepository.save(book);
     }
 
+    @Cacheable(value = "booksAll")
     public List<Book> getAllBooks() {
         return bookRepository.findAll();
     }
 
+    @Cacheable(value = "books", key = "#id")
     public Book getBookById(Long id) {
         return bookRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Book not found"));
     }
 
+    @CachePut(value = "books", key = "#id")
+    @CacheEvict(value = {"booksAll", "booksSearch"}, allEntries = true)
     public Book updateBook(Long id, BookRequest request) {
         Book existing = getBookById(id);
         existing.setTitle(request.getTitle());
@@ -51,6 +59,7 @@ public class BookService {
         return bookRepository.save(existing);
     }
 
+    @CacheEvict(value = {"books", "booksAll", "booksSearch"}, allEntries = true)
     public void deleteBook(Long id) {
         if (!bookRepository.existsById(id)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Book not found");
@@ -58,6 +67,7 @@ public class BookService {
         bookRepository.deleteById(id);
     }
 
+    @Cacheable(value = "booksSearch", key = "#title + '::' + #author")
     public List<Book> searchBooks(String title, String author) {
         boolean hasTitle = title != null && !title.isBlank();
         boolean hasAuthor = author != null && !author.isBlank();
