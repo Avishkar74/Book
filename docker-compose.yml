@@ -13,7 +13,7 @@ services:
       - "5432:5432"
 
   app:
-    image: book:0
+    image: ghcr.io/avishkar74/book:43a4fb4
     container_name: book-app
     restart: always
     depends_on:
